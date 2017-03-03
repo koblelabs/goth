@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 	"fmt"
-	"github.com/markbates/goth"
+	"github.com/koblelabs/goth"
 	"net/http/httptest"
 	"net/http"
 )

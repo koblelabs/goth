@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/markbates/goth"
+	"github.com/koblelabs/goth"
 )
 
 // Session stores data during the auth process with Influxcloud.

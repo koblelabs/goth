@@ -1,8 +1,8 @@
 package auth0_test
 
 import (
-	"github.com/markbates/goth"
-	"github.com/markbates/goth/providers/auth0"
+	"github.com/koblelabs/goth"
+	"github.com/koblelabs/goth/providers/auth0"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

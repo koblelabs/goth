@@ -1,10 +1,10 @@
 package meetup_test
 
 import (
-	"github.com/markbates/goth"
+	"github.com/koblelabs/goth"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/markbates/goth/providers/meetup"
+	"github.com/koblelabs/goth/providers/meetup"
 )
 
 func Test_Implements_Session(t *testing.T) {
