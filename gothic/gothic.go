@@ -44,8 +44,8 @@ for the requested provider.
 
 See https://github.com/markbates/goth/examples/main.go to see this in action.
 */
-func BeginAuthHandler(res http.ResponseWriter, req *http.Request) {
-	url, err := GetAuthURL(res, req)
+func BeginAuthHandler(res http.ResponseWriter, req *http.Request, force bool) {
+	url, err := GetAuthURL(res, req, force)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(res, err)
@@ -86,7 +86,7 @@ as either "provider" or ":provider".
 I would recommend using the BeginAuthHandler instead of doing all of these steps
 yourself, but that's entirely up to you.
 */
-func GetAuthURL(res http.ResponseWriter, req *http.Request) (string, error) {
+func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string, error) {
 
 	if !keySet && defaultStore == Store {
 		fmt.Println("goth/gothic: no SESSION_SECRET environment variable is set. The default cookie store is not available and any calls will fail. Ignore this warning if you are using a different store.")
@@ -101,7 +101,16 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	sess, err := provider.BeginAuth(SetState(req))
+
+	if force {
+		return authForced(res, req, provider)
+	}
+
+	return auth(res, req, provider)
+}
+
+func authForced(res http.ResponseWriter, req *http.Request, provider goth.Provider) (string, error) {
+	sess, err := provider.BeginAuthForced(SetState(req))
 	if err != nil {
 		return "", err
 	}
@@ -111,8 +120,30 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request) (string, error) {
 		return "", err
 	}
 
-	err = storeInSession(providerName, sess.Marshal(), req, res)
+	session, _ := Store.Get(req, SessionName)
+	session.Values[SessionName] = sess.Marshal()
+	err = session.Save(req, res)
+	if err != nil {
+		return "", err
+	}
 
+	return url, err
+}
+
+func auth(res http.ResponseWriter, req *http.Request, provider goth.Provider) (string, error) {
+	sess, err := provider.BeginAuthForced(SetState(req))
+	if err != nil {
+		return "", err
+	}
+
+	url, err := sess.GetAuthURL()
+	if err != nil {
+		return "", err
+	}
+
+	session, _ := Store.Get(req, SessionName)
+	session.Values[SessionName] = sess.Marshal()
+	err = session.Save(req, res)
 	if err != nil {
 		return "", err
 	}
