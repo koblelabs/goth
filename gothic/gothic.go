@@ -103,7 +103,6 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 	}
 
 	var sess goth.Session
-	var err error
 
 	if force {
 		sess, err = provider.BeginAuthForced(SetState(req))
