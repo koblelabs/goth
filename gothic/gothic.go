@@ -103,14 +103,15 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 	}
 
 	var sess goth.Session
+	var err error
 
 	if force {
-		sess, err := provider.BeginAuthForced(SetState(req))
+		sess, err = provider.BeginAuthForced(SetState(req))
 		if err != nil {
 			return "", err
 		}
 	} else {
-		sess, err := provider.BeginAuth(SetState(req))
+		sess, err = provider.BeginAuth(SetState(req))
 		if err != nil {
 			return "", err
 		}
