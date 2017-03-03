@@ -102,33 +102,51 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 		return "", err
 	}
 
-	var sess goth.Session
-
 	if force {
-		sess, err = provider.BeginAuthForced(SetState(req))
+
+		sess, err := provider.BeginAuthForced(SetState(req))
 		if err != nil {
 			return "", err
 		}
+
+		url, err := sess.GetAuthURL()
+		if err != nil {
+			return "", err
+		}
+
+		session, _ := Store.Get(req, SessionName)
+		session.Values[SessionName] = sess.Marshal()
+		err = session.Save(req, res)
+		if err != nil {
+			return "", err
+		}
+
+		return url, err
+
 	} else {
-		sess, err = provider.BeginAuth(SetState(req))
+
+		sess, err := provider.BeginAuth(SetState(req))
 		if err != nil {
 			return "", err
 		}
+
+		url, err := sess.GetAuthURL()
+		if err != nil {
+			return "", err
+		}
+
+		session, _ := Store.Get(req, SessionName)
+		session.Values[SessionName] = sess.Marshal()
+		err = session.Save(req, res)
+		if err != nil {
+			return "", err
+		}
+
+		return url, err
+
 	}
 
-	url, err := sess.GetAuthURL()
-	if err != nil {
-		return "", err
-	}
-
-	session, _ := Store.Get(req, SessionName)
-	session.Values[SessionName] = sess.Marshal()
-	err = session.Save(req, res)
-	if err != nil {
-		return "", err
-	}
-
-	return url, err
+	return "", nil
 }
 
 /*
