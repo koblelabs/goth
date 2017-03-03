@@ -102,38 +102,18 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 		return "", err
 	}
 
+	var sess goth.Session
+
 	if force {
-		return authForced(res, req, provider)
-	}
-
-	return auth(res, req, provider)
-}
-
-func authForced(res http.ResponseWriter, req *http.Request, provider goth.Provider) (string, error) {
-	sess, err := provider.BeginAuthForced(SetState(req))
-	if err != nil {
-		return "", err
-	}
-
-	url, err := sess.GetAuthURL()
-	if err != nil {
-		return "", err
-	}
-
-	session, _ := Store.Get(req, SessionName)
-	session.Values[SessionName] = sess.Marshal()
-	err = session.Save(req, res)
-	if err != nil {
-		return "", err
-	}
-
-	return url, err
-}
-
-func auth(res http.ResponseWriter, req *http.Request, provider goth.Provider) (string, error) {
-	sess, err := provider.BeginAuth(SetState(req))
-	if err != nil {
-		return "", err
+		sess, err := provider.BeginAuthForced(SetState(req))
+		if err != nil {
+			return "", err
+		}
+	} else {
+		sess, err := provider.BeginAuth(SetState(req))
+		if err != nil {
+			return "", err
+		}
 	}
 
 	url, err := sess.GetAuthURL()
