@@ -131,7 +131,7 @@ func authForced(res http.ResponseWriter, req *http.Request, provider goth.Provid
 }
 
 func auth(res http.ResponseWriter, req *http.Request, provider goth.Provider) (string, error) {
-	sess, err := provider.BeginAuthForced(SetState(req))
+	sess, err := provider.BeginAuth(SetState(req))
 	if err != nil {
 		return "", err
 	}
