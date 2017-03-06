@@ -8,7 +8,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -89,9 +88,6 @@ func (p *Provider) BeginAuthForced(state string) (goth.Session, error) {
 	q.Add("auth_type", "rerequest")
 	u.RawQuery = q.Encode()
 
-	// TODO: remove this
-	log.Printf("Auth Code URL: %s", u.String())
-	//
 	session := &Session{
 		AuthURL: u.String(),
 	}
