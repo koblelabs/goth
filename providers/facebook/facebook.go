@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -78,7 +79,10 @@ func (p *Provider) BeginAuth(state string) (goth.Session, error) {
 
 // BeginAuthForced asks Facebook for an authentication end-point.
 func (p *Provider) BeginAuthForced(state string) (goth.Session, error) {
+	log.Println("trying to force auth prompt")
+
 	url := p.config.AuthCodeURL(state, oauth2.ApprovalForce)
+	log.Printf("Auth Code URL: %s", url)
 	session := &Session{
 		AuthURL: url,
 	}
