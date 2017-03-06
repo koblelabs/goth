@@ -86,7 +86,7 @@ func (p *Provider) BeginAuthForced(state string) (goth.Session, error) {
 	}
 
 	q := u.Query()
-	q.Add("auth_type", "reauthenticate")
+	q.Add("auth_type", "rerequest")
 	u.RawQuery = q.Encode()
 
 	// TODO: remove this
