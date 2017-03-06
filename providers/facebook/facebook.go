@@ -77,14 +77,23 @@ func (p *Provider) BeginAuth(state string) (goth.Session, error) {
 	return session, nil
 }
 
-// BeginAuthForced asks Facebook for an authentication end-point.
+// BeginAuthForced asks Facebook for an authentication end-point, but requests that the user-facing approval prompt be shown again
 func (p *Provider) BeginAuthForced(state string) (goth.Session, error) {
-	log.Println("trying to force auth prompt")
 
-	url := p.config.AuthCodeURL(state, oauth2.ApprovalForce)
-	log.Printf("Auth Code URL: %s", url)
+	u, err := url.Parse(p.config.AuthCodeURL(state))
+	if err != nil {
+		return &Session{}, fmt.Errorf("Error encountered while trying to parse url: %v", err)
+	}
+
+	q := u.Query()
+	q.Add("auth_type", "reauthenticate")
+	u.RawQuery = q.Encode()
+
+	// TODO: remove this
+	log.Printf("Auth Code URL: %s", u.String())
+	//
 	session := &Session{
-		AuthURL: url,
+		AuthURL: u.String(),
 	}
 	return session, nil
 }
