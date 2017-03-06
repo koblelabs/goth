@@ -10,7 +10,6 @@ package gothic
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -115,9 +114,7 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 			return "", err
 		}
 
-		session, _ := Store.Get(req, SessionName)
-		session.Values[SessionName] = sess.Marshal()
-		err = session.Save(req, res)
+		err = storeInSession(providerName, sess.Marshal(), req, res)
 		if err != nil {
 			return "", err
 		}
@@ -136,9 +133,7 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 		return "", err
 	}
 
-	session, _ := Store.Get(req, SessionName)
-	session.Values[SessionName] = sess.Marshal()
-	err = session.Save(req, res)
+	err = storeInSession(providerName, sess.Marshal(), req, res)
 	if err != nil {
 		return "", err
 	}
@@ -257,9 +252,6 @@ func storeInSession(key string, value string, req *http.Request, res http.Respon
 
 func getFromSession(key string, req *http.Request) (string, error) {
 	session, _ := Store.Get(req, key+SessionName)
-
-	log.Println(key)
-	log.Printf("%+v", session.Values)
 
 	value := session.Values[key]
 	if value == nil {
