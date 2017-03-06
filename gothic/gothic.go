@@ -117,29 +117,6 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 
 		session, _ := Store.Get(req, SessionName)
 		session.Values[SessionName] = sess.Marshal()
-		log.Println(session.Values)
-		err = session.Save(req, res)
-		if err != nil {
-			return "", err
-		}
-
-		return url, err
-
-	} else {
-
-		sess, err := provider.BeginAuth(SetState(req))
-		if err != nil {
-			return "", err
-		}
-
-		url, err := sess.GetAuthURL()
-		if err != nil {
-			return "", err
-		}
-
-		session, _ := Store.Get(req, SessionName)
-		session.Values[SessionName] = sess.Marshal()
-		log.Println(session.Values)
 		err = session.Save(req, res)
 		if err != nil {
 			return "", err
@@ -149,7 +126,25 @@ func GetAuthURL(res http.ResponseWriter, req *http.Request, force bool) (string,
 
 	}
 
-	return "", nil
+	sess, err := provider.BeginAuth(SetState(req))
+	if err != nil {
+		return "", err
+	}
+
+	url, err := sess.GetAuthURL()
+	if err != nil {
+		return "", err
+	}
+
+	session, _ := Store.Get(req, SessionName)
+	session.Values[SessionName] = sess.Marshal()
+	err = session.Save(req, res)
+	if err != nil {
+		return "", err
+	}
+
+	return url, err
+
 }
 
 /*
@@ -262,6 +257,9 @@ func storeInSession(key string, value string, req *http.Request, res http.Respon
 
 func getFromSession(key string, req *http.Request) (string, error) {
 	session, _ := Store.Get(req, key+SessionName)
+
+	log.Println(key)
+	log.Printf("%+v", session.Values)
 
 	value := session.Values[key]
 	if value == nil {
