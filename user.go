@@ -15,6 +15,7 @@ type User struct {
 	RawData           map[string]interface{}
 	Provider          string
 	Email             string
+	Birthday          string
 	Name              string
 	FirstName         string
 	LastName          string

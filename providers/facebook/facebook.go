@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -143,6 +144,7 @@ func userFromReader(reader io.Reader, user *goth.User) error {
 	u := struct {
 		ID        string `json:"id"`
 		Email     string `json:"email"`
+		Birthday  string `json:"birthday"`
 		About     string `json:"about"`
 		Name      string `json:"name"`
 		FirstName string `json:"first_name"`
@@ -168,10 +170,14 @@ func userFromReader(reader io.Reader, user *goth.User) error {
 	user.LastName = u.LastName
 	user.NickName = u.Name
 	user.Email = u.Email
+	user.Birthday = u.Birthday
 	user.Description = u.About
 	user.AvatarURL = u.Picture.Data.URL
 	user.UserID = u.ID
 	user.Location = u.Location.Name
+
+	// TODO: remove this
+	log.Printf("Retrieved User: %+v", user)
 
 	return err
 }
