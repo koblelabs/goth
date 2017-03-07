@@ -116,6 +116,9 @@ func (p *Provider) FetchUser(session goth.Session) (goth.User, error) {
 	hash.Write([]byte(sess.AccessToken))
 	appsecretProof := hex.EncodeToString(hash.Sum(nil))
 
+	//TODO: remove this
+	log.Println(endpointProfile + "&access_token=" + url.QueryEscape(sess.AccessToken) + "&appsecret_proof=" + appsecretProof)
+
 	response, err := p.Client().Get(endpointProfile + "&access_token=" + url.QueryEscape(sess.AccessToken) + "&appsecret_proof=" + appsecretProof)
 	if err != nil {
 		return user, err
