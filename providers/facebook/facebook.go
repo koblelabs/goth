@@ -196,6 +196,7 @@ func newConfig(provider *Provider, scopes []string) *oauth2.Config {
 		},
 		Scopes: []string{
 			"email",
+			"birthday",
 		},
 	}
 
