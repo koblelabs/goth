@@ -8,7 +8,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -24,7 +23,7 @@ import (
 const (
 	authURL         string = "https://www.facebook.com/dialog/oauth"
 	tokenURL        string = "https://graph.facebook.com/oauth/access_token"
-	endpointProfile string = "https://graph.facebook.com/me?fields=email,first_name,last_name,link,about,id,name,picture,birthday"
+	endpointProfile string = "https://graph.facebook.com/me?fields=email,first_name,last_name,link,id,name,birthday"
 )
 
 // New creates a new Facebook provider, and sets up important connection details.
@@ -116,9 +115,6 @@ func (p *Provider) FetchUser(session goth.Session) (goth.User, error) {
 	hash.Write([]byte(sess.AccessToken))
 	appsecretProof := hex.EncodeToString(hash.Sum(nil))
 
-	//TODO: remove this
-	log.Println(endpointProfile + "&access_token=" + url.QueryEscape(sess.AccessToken) + "&appsecret_proof=" + appsecretProof)
-
 	response, err := p.Client().Get(endpointProfile + "&access_token=" + url.QueryEscape(sess.AccessToken) + "&appsecret_proof=" + appsecretProof)
 	if err != nil {
 		return user, err
@@ -148,16 +144,10 @@ func userFromReader(reader io.Reader, user *goth.User) error {
 		ID        string `json:"id"`
 		Email     string `json:"email"`
 		Birthday  string `json:"birthday"`
-		About     string `json:"about"`
 		Name      string `json:"name"`
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
 		Link      string `json:"link"`
-		Picture   struct {
-			Data struct {
-				URL string `json:"url"`
-			} `json:"data"`
-		} `json:"picture"`
 	}{}
 
 	err := json.NewDecoder(reader).Decode(&u)
@@ -171,8 +161,6 @@ func userFromReader(reader io.Reader, user *goth.User) error {
 	user.NickName = u.Name
 	user.Email = u.Email
 	user.Birthday = u.Birthday
-	user.Description = u.About
-	user.AvatarURL = u.Picture.Data.URL
 	user.UserID = u.ID
 
 	return err
