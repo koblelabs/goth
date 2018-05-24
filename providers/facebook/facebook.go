@@ -24,7 +24,7 @@ import (
 const (
 	authURL         string = "https://www.facebook.com/dialog/oauth"
 	tokenURL        string = "https://graph.facebook.com/oauth/access_token"
-	endpointProfile string = "https://graph.facebook.com/me?fields=email,first_name,last_name,link,about,id,name,picture,location,birthday"
+	endpointProfile string = "https://graph.facebook.com/me?fields=email,first_name,last_name,link,about,id,name,picture,birthday"
 )
 
 // New creates a new Facebook provider, and sets up important connection details.
@@ -158,9 +158,6 @@ func userFromReader(reader io.Reader, user *goth.User) error {
 				URL string `json:"url"`
 			} `json:"data"`
 		} `json:"picture"`
-		Location struct {
-			Name string `json:"name"`
-		} `json:"location"`
 	}{}
 
 	err := json.NewDecoder(reader).Decode(&u)
@@ -177,10 +174,6 @@ func userFromReader(reader io.Reader, user *goth.User) error {
 	user.Description = u.About
 	user.AvatarURL = u.Picture.Data.URL
 	user.UserID = u.ID
-	user.Location = u.Location.Name
-
-	// TODO: remove this
-	log.Printf("Retrieved User: %+v", user)
 
 	return err
 }
